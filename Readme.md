@@ -1,5 +1,13 @@
 # cloudformation linkup server stuff
 
-- SshIngressIP should be the admin IP. Needs to follow the `12.34.45.56/32` format
+# Prerequisites 
+
 - `chmod 600 ~/.ssh/Linkup.pem`
+
+# Deploying
+
+- Run the `create-stack.sh` script
+
+# SSH access
+
 - Log in with `ubuntu@<instance-ip> -i ~/.ssh/Linkup.pem`

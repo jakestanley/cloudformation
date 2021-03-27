@@ -5,12 +5,12 @@ Parameters:
   SshIngressIP:
     Type: String
     MinLength: 1
-    Default: "86.10.162.67/32"
+    # Default: "1.2.3.4/32"
 
   InstanceType:
     Type: String
     AllowedValues: [t2.micro, t2.large]
-    Default: t2.micro
+    Default: t2.large
 
   KeyName:
     Type: String
@@ -70,7 +70,6 @@ Resources:
           Ebs:
             # Size in GiB
             VolumeSize: !Ref DiskSizeGB
-      # TODO UserData, etc
 
 Outputs:
 
