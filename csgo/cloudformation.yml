@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+  SshIngressIP:
+    Type: String
+    MinLength: 1
+    Default: "86.10.162.67/32"
+
+  InstanceType:
+    Type: String
+    AllowedValues: [t2.micro, t2.large]
+    Default: t2.micro
+
+  KeyName:
+    Type: String
+    Default: Linkup
+    MinLength: 1
+
+  DiskSizeGB:
+    Type: String
+    Default: 50
+    MinLength: 1
+
+Mappings:
+
+  AWSRegion2AMI:
+    # London
+    eu-west-2:
+      AMI: ami-005383956f2e5fb96
+
+Resources:
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Enable access to the instance. '
+      SecurityGroupIngress:
+      - CidrIp: !Ref SshIngressIP
+        IpProtocol: TCP
+        FromPort: '22'
+        ToPort: '22'
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: TCP
+        FromPort: '27015'
+        ToPort: '27015'
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: UDP
+        FromPort: '26900'
+        ToPort: '27030'
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: UDP
+        FromPort: '27000'
+        ToPort: '27030'
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: UDP
+        FromPort: '4380'
+        ToPort: '4380'
+
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [AWSRegion2AMI, !Ref "AWS::Region", AMI]
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref SecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            # Size in GiB
+            VolumeSize: !Ref DiskSizeGB
+      # TODO UserData, etc
+
+Outputs:
+
+  InstancePublicIP:
+    Description: "Public IP address of EC2 instance"
+    Value: !GetAtt [Instance, PublicIp]
+    Export:
+      Name: !Join ["::", [!Ref "AWS::StackName", "PublicIP"]]
